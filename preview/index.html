@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ABG Model Analytics — Interactive Preview</title>
+<link data-abg-analytics rel="stylesheet" href="data:text/css,">
+<style>.abg-analytics {
+  color-scheme: dark;
+  box-sizing: border-box;
+  width: min(1500px, 96vw);
+  max-width: 96vw;
+  height: min(1100px, 96vh);
+  max-height: 96vh;
+  padding: 28px;
+  border: 1px solid #393e48;
+  border-radius: 16px;
+  background: #1b1e24;
+  color: #edf0f5;
+  font: 14px/1.5 system-ui, sans-serif;
+  overflow: auto;
+}
+.abg-analytics::backdrop { background: #090b10cc; backdrop-filter: blur(3px); }
+.abg-analytics[open]:not(.abg-confirm) { display: flex; flex-direction: column; }
+.abg-analytics[open]:not(.abg-confirm) > * { flex-shrink: 0; }
+.abg-analytics[open]:not(.abg-confirm) > .abg-content { flex: 1 1 auto; min-height: 140px; display: flex; flex-direction: column; overflow: auto; }
+.abg-content > .abg-scroll { flex: 1 1 auto; min-height: 0; max-height: none; }
+.abg-analytics *, .abg-analytics *::before, .abg-analytics *::after { box-sizing: border-box; }
+.abg-analytics header, .abg-analytics footer { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.abg-analytics h2 { font-size: 26px; margin: 4px 0; letter-spacing: -.7px; }
+.abg-analytics p { margin: 8px 0 16px; }
+.abg-analytics button, .abg-analytics input, .abg-analytics select { color: inherit; background: #252a33; border: 1px solid #4b5363; border-radius: 7px; padding: 9px 12px; font: inherit; min-height: 38px; }
+.abg-analytics button { cursor: pointer; }
+.abg-analytics button:hover:not(:disabled) { background: #353e4e; }
+.abg-analytics button:disabled { opacity: .45; cursor: default; }
+.abg-analytics :focus-visible { outline: 3px solid #94c7ff; outline-offset: 3px; }
+.abg-analytics input[type=checkbox] { width: 17px; height: 17px; min-height: 17px; accent-color: #9ce3cf; cursor: pointer; }
+.abg-analytics label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #b9c4d3; }
+.abg-settings { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; border-top: 1px solid #46505e; padding-top: 16px; margin-top: 8px; }
+.abg-directory { flex: 1 1 420px; }
+.abg-settings input[type=number] { width: 150px; }
+.abg-settings p { flex-basis: 100%; color: #becbdd; margin-top: 0; }
+.abg-message { white-space: pre-wrap; overflow-wrap: anywhere; margin: 12px 0; color: #a4e4c3; }
+.abg-message:empty { display: none; }
+.abg-analytics .abg-error { color: #ffb2ad; }
+.abg-tabs { display: flex; gap: 5px; flex-wrap: wrap; border-bottom: 1px solid #3b414e; padding-bottom: 10px; }
+.abg-tabs button { border-color: transparent; background: transparent; color: #b8c2d1; padding: 8px 11px; }
+.abg-tabs button[aria-pressed=true] { background: #303e3e; border-color: #536e66; color: #b8f2de; }
+.abg-history-note { color: #a8b4c5; font-size: 12px; max-width: 1200px; }
+.abg-filters { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.abg-filters[hidden] { display: none; }
+.abg-filters select { max-width: min(340px, 80vw); }
+.abg-filters label:first-child { flex: 1 1 280px; }
+.abg-content { margin-top: 16px; }
+.abg-scroll { overflow: auto; max-height: 52vh; }
+.abg-analytics table { border-collapse: collapse; width: 100%; text-align: left; }
+.abg-analytics th, .abg-analytics td { border-bottom: 1px solid #343b48; padding: 14px 12px; vertical-align: top; }
+.abg-analytics th { position: sticky; top: 0; background: #242a34; color: #bac6d6; z-index: 1; font-size: 12px; font-weight: 500; }
+.abg-analytics tbody tr:hover { background: #252c36; }
+.abg-analytics tbody tr:has(input:checked) { background: #243731; }
+.abg-analytics small { display: block; color: #b3bfd0; margin-top: 5px; font-size: 12px; }
+.abg-path strong { font-weight: 550; }
+.abg-path { overflow-wrap: anywhere; min-width: 220px; }
+.abg-nowrap { white-space: nowrap; }
+.abg-badge { display: inline-block; border: 1px solid #566177; border-radius: 5px; padding: 2px 8px; font-size: 11px; white-space: nowrap; }
+.abg-badge-stale { color: #f1c887; background: #392f21; border-color: #6c5331; }
+.abg-badge-recent { color: #a7e7ca; background: #233a30; border-color: #426957; }
+.abg-badge-unknown { color: #c7c1e5; background: #312d40; border-color: #5e557a; }
+.abg-category { color: #c4cedd; font-size: 12px; }
+.abg-confirm { width: min(1150px, 94vw); height: fit-content; }
+.abg-confirm td:last-child { white-space: nowrap; }
+.abg-confirm footer { margin-top: 20px; justify-content: end; }
+.abg-eyebrow { color: #a3b4cd; font-size: 10px; letter-spacing: 1.6px; font-weight: 650; }
+.abg-header-actions, .abg-selection-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.abg-settings-panel { margin: 8px 0 16px; border: 1px solid #3c4554; border-radius: 8px; background: #20262f; padding: 11px 14px; }
+.abg-settings-panel > summary { cursor: pointer; font-size: 12px; color: #dce5f1; }
+.abg-settings-summary { color: #aebbd0; margin-left: 16px; overflow-wrap: anywhere; }
+.abg-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.abg-analytics .abg-stat { text-align: left; background: #232933; border: 1px solid #414b5c; padding: 12px 16px; min-width: 0; }
+.abg-stat > span { display: block; font-size: 12px; color: #c6cfdd; }
+.abg-stat > strong { display: block; font-size: 29px; font-weight: 550; margin-top: 5px; letter-spacing: -.8px; color: #f1f5fa; }
+.abg-stat > small { font-size: 11px; }
+.abg-analytics .abg-stat-stale { border-top: 2px solid #bd9457; }
+.abg-analytics .abg-stat-unknown { border-top: 2px solid #8c7cae; }
+.abg-analytics .abg-stat-recent { border-top: 2px solid #70b19a; }
+.abg-analytics .abg-stat-trash { border-top: 2px solid #7a9bc8; }
+.abg-analytics .abg-protect { font-size: 11px; min-height: 32px; padding: 5px 9px; }
+.abg-analytics .abg-protect[aria-pressed=true] { background: #303e3e; color: #b8f2de; border-color: #648b7e; }
+.abg-model-details { margin-top: 8px; max-width: 600px; }
+.abg-model-details summary { font-size: 11px; color: #c3b5ed; cursor: pointer; }
+.abg-model-details > div { padding: 10px; background: #202631; border: 1px solid #414c60; border-radius: 6px; margin-top: 8px; }
+.abg-analytics .abg-reference-list { margin: 8px 0; padding-left: 17px; font-size: 12px; overflow-wrap: anywhere; }
+.abg-reference-list li + li { margin-top: 8px; }
+.abg-reference-list small { font-size: 11px; }
+.abg-analytics .abg-detail-note { font-size: 12px; color: #b3bfd0; }
+.abg-copy-actions { display: flex; gap: 16px; justify-content: space-between; align-items: center; margin: 0 0 12px; }
+.abg-copy-actions p { font-size: 12px; max-width: 850px; margin: 0; color: #bdc8d9; }
+.abg-copy-actions button { flex-shrink: 0; }
+.abg-trash-heading { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.abg-trash-heading > strong { font-size: 22px; }
+.abg-trash-heading > span { color: #bdc8d9; }
+.abg-trash-locations { margin-bottom: 16px; }
+.abg-trash-locations summary { cursor: pointer; color: #c4d6ee; }
+.abg-workflow-warning { border: 1px solid #8a6e40; border-radius: 7px; background: #393020; color: #f3d49f; padding: 12px 14px; margin-bottom: 14px; }
+.abg-workflow-warning p { margin: 6px 0 0; font-size: 12px; }
+.abg-analytics button.abg-primary { background: #a2e5cd; color: #162a23; border-color: #a2e5cd; font-weight: 650; }
+.abg-analytics button.abg-primary:hover:not(:disabled) { background: #c5f3e2; }
+.abg-results-summary { font-size: 12px; color: #b7c5d8; }
+.abg-selection { position: sticky; bottom: -28px; margin: 20px -4px -4px; border-top: 1px solid #495567; padding: 18px 4px 4px; background: #1b1e24; z-index: 2; }
+.abg-selection > div:first-child { min-width: 0; }
+.abg-selection-count { font-size: 13px; }
+.abg-selection-help { font-size: 11px; }
+.abg-selection[hidden] { display: none; }
+.abg-callout { border: 1px solid #5e557a; padding: 10px 13px; border-radius: 7px; font-size: 12px; color: #d5cdec; background: #2c2839; }
+.abg-empty { text-align: center; padding: 40px 16px; border: 1px dashed #515b6c; border-radius: 8px; color: #c4cfe0; }
+.abg-destination { color: #b8ecd8; }
+.abg-preview-badge { display: inline-block; color: #f0d69b; background: #463c25; border: 1px solid #8b7546; border-radius: 20px; padding: 3px 10px; font-size: 11px; margin-left: 12px; vertical-align: middle; letter-spacing: normal; }
+.abg-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 700px) {
+  .abg-analytics { padding: 14px; }
+  .abg-analytics h2 { font-size: 18px; }
+  .abg-analytics header { flex-wrap: wrap; }
+  .abg-overview { grid-template-columns: 1fr; gap: 8px; }
+  .abg-copy-actions { flex-wrap: wrap; }
+  .abg-stat > strong { font-size: 24px; }
+  .abg-settings-summary { display: block; margin: 7px 0 0 15px; }
+  .abg-selection { flex-wrap: wrap; bottom: -14px; }
+  .abg-settings label, .abg-filters label { flex: 1 1 100%; }
+  .abg-filters select { max-width: 100%; }
+}
+
+body{margin:0;background:#11151c;color:#dce7f5;font:14px system-ui;min-height:100vh}
+.preview-shell{padding:36px;max-width:1000px;margin:auto}.preview-shell h1{font-size:28px}
+.preview-shell p{color:#b6c5d9;line-height:1.7}.preview-shell button{border:1px solid #698577;background:#a2e5cd;border-radius:8px;padding:12px 20px;cursor:pointer;color:#172d25;font-weight:600}
+</style></head><body><main class="preview-shell"><h1>ABG Model Analytics</h1><p>Interactive preview · sample Windows model library</p><p>Try filters, cleanup settings, selection, move previews, simulated trash moves, and restores. Everything stays in memory. This page never accesses your model files. Reload to reset the sample library.</p><div id="preview-launcher"></div></main>
+<script type="module">// Standalone preview adapter. All operations below use sample data in memory.
+const samples = [{"id": "sample-model-0", "kind": "diffusion_models", "kinds": ["diffusion_models"], "path": "D:\\AI\\ComfyUI\\models\\diffusion_models\\flux\\flux2-dev-fp8.safetensors", "root": "D:\\AI\\ComfyUI\\models\\diffusion_models", "relative_path": "flux/flux2-dev-fp8.safetensors", "logical_path": "models/diffusion_models/flux/flux2-dev-fp8.safetensors", "size_bytes": 24051816857, "disabled": false, "can_move": true, "move_reason": "", "days": 78}, {"id": "sample-model-1", "kind": "checkpoints", "kinds": ["checkpoints"], "path": "D:\\AI\\ComfyUI\\models\\checkpoints\\sdxl\\juggernautXL_v9.safetensors", "root": "D:\\AI\\ComfyUI\\models\\checkpoints", "relative_path": "sdxl/juggernautXL_v9.safetensors", "logical_path": "models/checkpoints/sdxl/juggernautXL_v9.safetensors", "size_bytes": 6936372183, "disabled": false, "can_move": true, "move_reason": "", "days": 63}, {"id": "sample-model-2", "kind": "loras", "kinds": ["loras"], "path": "D:\\AI\\ComfyUI\\models\\loras\\flux2\\cinematic-light-v2.safetensors", "root": "D:\\AI\\ComfyUI\\models\\loras", "relative_path": "flux2/cinematic-light-v2.safetensors", "logical_path": "models/loras/flux2/cinematic-light-v2.safetensors", "size_bytes": 837518622, "disabled": false, "can_move": true, "move_reason": "", "days": 44}, {"id": "sample-model-3", "kind": "controlnet", "kinds": ["controlnet"], "path": "E:\\SharedModels\\controlnet\\sdxl\\depth-controlnet.safetensors", "root": "E:\\SharedModels\\controlnet", "relative_path": "sdxl/depth-controlnet.safetensors", "logical_path": "models/controlnet/sdxl/depth-controlnet.safetensors", "size_bytes": 2673617141, "disabled": false, "can_move": true, "move_reason": "", "days": 91}, {"id": "sample-model-4", "kind": "upscale_models", "kinds": ["upscale_models"], "path": "D:\\AI\\ComfyUI\\models\\upscale_models\\4x_RealESRGAN.pth", "root": "D:\\AI\\ComfyUI\\models\\upscale_models", "relative_path": "4x_RealESRGAN.pth", "logical_path": "models/upscale_models/4x_RealESRGAN.pth", "size_bytes": 68719476, "disabled": false, "can_move": true, "move_reason": "", "days": 112}, {"id": "sample-model-5", "kind": "diffusion_models", "kinds": ["diffusion_models"], "path": "E:\\SharedModels\\diffusion_models\\flux\\flux2-dev-Q5_K_M.gguf", "root": "E:\\SharedModels\\diffusion_models", "relative_path": "flux/flux2-dev-Q5_K_M.gguf", "logical_path": "models/diffusion_models/flux/flux2-dev-Q5_K_M.gguf", "size_bytes": 17072495001, "disabled": false, "can_move": true, "move_reason": "", "days": null}, {"id": "sample-model-6", "kind": "loras", "kinds": ["loras"], "path": "D:\\AI\\ComfyUI\\models\\loras\\flux2\\portrait-studio.safetensors", "root": "D:\\AI\\ComfyUI\\models\\loras", "relative_path": "flux2/portrait-studio.safetensors", "logical_path": "models/loras/flux2/portrait-studio.safetensors", "size_bytes": 440234147, "disabled": false, "can_move": true, "move_reason": "", "days": null}, {"id": "sample-model-7", "kind": "vae", "kinds": ["vae"], "path": "D:\\AI\\ComfyUI\\models\\vae\\sdxl\\sdxl_vae.safetensors", "root": "D:\\AI\\ComfyUI\\models\\vae", "relative_path": "sdxl/sdxl_vae.safetensors", "logical_path": "models/vae/sdxl/sdxl_vae.safetensors", "size_bytes": 343597383, "disabled": false, "can_move": true, "move_reason": "", "days": null}, {"id": "sample-model-8", "kind": "diffusion_models", "kinds": ["diffusion_models"], "path": "D:\\AI\\ComfyUI\\models\\diffusion_models\\flux\\flux1-schnell.safetensors", "root": "D:\\AI\\ComfyUI\\models\\diffusion_models", "relative_path": "flux/flux1-schnell.safetensors", "logical_path": "models/diffusion_models/flux/flux1-schnell.safetensors", "size_bytes": 12777527705, "disabled": false, "can_move": true, "move_reason": "", "days": 0}, {"id": "sample-model-9", "kind": "loras", "kinds": ["loras"], "path": "E:\\SharedModels\\loras\\flux2\\cinematic-light-v2.safetensors", "root": "E:\\SharedModels\\loras", "relative_path": "flux2/cinematic-light-v2.safetensors", "logical_path": "models/loras/flux2/cinematic-light-v2.safetensors", "size_bytes": 837518622, "disabled": false, "can_move": true, "move_reason": "", "days": 2}, {"id": "sample-model-10", "kind": "text_encoders", "kinds": ["text_encoders"], "path": "D:\\AI\\ComfyUI\\models\\text_encoders\\t5xxl_fp16.safetensors", "root": "D:\\AI\\ComfyUI\\models\\text_encoders", "relative_path": "t5xxl_fp16.safetensors", "logical_path": "models/text_encoders/t5xxl_fp16.safetensors", "size_bytes": 9771050598, "disabled": false, "can_move": true, "move_reason": "", "days": 1}, {"id": "sample-model-11", "kind": "vae", "kinds": ["vae"], "path": "D:\\AI\\ComfyUI\\models\\vae\\flux\\ae.safetensors", "root": "D:\\AI\\ComfyUI\\models\\vae", "relative_path": "flux/ae.safetensors", "logical_path": "models/vae/flux/ae.safetensors", "size_bytes": 332859965, "disabled": false, "can_move": true, "move_reason": "", "days": 0}];
+const initialTime = Date.now();
+for (const [index, model] of samples.entries()) {
+  model.last_used =
+    model.days === null ? null : new Date(initialTime - model.days * 86400000).toISOString();
+  model.last_loaded = model.last_used;
+  model.last_referenced = model.last_used;
+  model.use_count = model.days === null ? 0 : 5;
+  model.protected = [8, 10, 11].includes(index);
+  model.contentSignature = [2, 9].includes(index) ? 'cinematic-identical-weights' : model.id;
+}
+const savedSamples = [
+  {
+    name: 'default/workflows/portraits/Flux portrait.json',
+    references: [
+      ['diffusion_models', 'flux/flux2-dev-fp8.safetensors'],
+      ['loras', 'flux2/cinematic-light-v2.safetensors'],
+      ['text_encoders', 't5xxl_fp16.safetensors'],
+      ['vae', 'flux/ae.safetensors'],
+    ],
+  },
+  {
+    name: 'default/workflows/SDXL product photos.json',
+    references: [
+      ['checkpoints', 'sdxl/juggernautXL_v9.safetensors'],
+      ['controlnet', 'sdxl/depth-controlnet.safetensors'],
+      ['vae', 'sdxl/sdxl_vae.safetensors'],
+    ],
+  },
+  {
+    name: 'default/workflows/Quick drafts.json',
+    references: [
+      ['diffusion_models', 'flux/flux1-schnell.safetensors'],
+      ['text_encoders', 't5xxl_fp16.safetensors'],
+      ['vae', 'flux/ae.safetensors'],
+    ],
+  },
+  {
+    name: 'default/workflows/experiments/Custom GGUF.json',
+    references: [[null, 'flux/flux2-dev-Q5_K_M.gguf']],
+  },
+].map((workflow) => ({
+  ...workflow,
+  path: `D:\\AI\\ComfyUI\\user\\${workflow.name.replaceAll('/', '\\')}`,
+}));
+const previewState = {
+  models: structuredClone(samples),
+  moves: [],
+  plans: new Map(),
+  checked: new Set(),
+  trashLocations: new Set(['F:\\ModelArchive\\trash', 'G:\\PreviousArchive\\trash']),
+  settings: {
+    trash_directory: 'F:\\ModelArchive',
+    stale_days: 30,
+    tracking_since: new Date(initialTime - 120 * 86400000).toISOString(),
+  },
+};
+for (const [index, location, size] of [
+  [0, 'F:\\ModelArchive', 3.4],
+  [1, 'G:\\PreviousArchive', 1.2],
+]) {
+  const model = {
+    ...structuredClone(samples[2]),
+    id: `archived-sample-${index}`,
+    path: `D:\\AI\\ComfyUI\\models\\loras\\archive\\retired-style-${index}.safetensors`,
+    relative_path: `archive/retired-style-${index}.safetensors`,
+    logical_path: `models/loras/archive/retired-style-${index}.safetensors`,
+    size_bytes: Math.round(size * 1024 ** 3),
+    protected: false,
+  };
+  previewState.moves.push({
+    id: `old-preview-move-${index}`,
+    source: model.path,
+    destination: `${location}\\trash\\${model.logical_path.replaceAll('/', '\\')}`,
+    size_bytes: model.size_bytes,
+    created_at: new Date(initialTime - (index + 2) * 86400000).toISOString(),
+    status: 'trashed',
+    model,
+  });
+}
+
+function rebuildPreview() {
+  const groups = new Map();
+  for (const model of previewState.models) {
+    model.status = !model.last_used
+      ? 'unknown'
+      : (Date.now() - new Date(model.last_used).getTime()) / 86400000 >
+          previewState.settings.stale_days
+        ? 'stale'
+        : 'recent';
+    model.can_move = !model.protected;
+    model.move_reason = model.protected
+      ? 'Protected model. Remove protection before moving it.'
+      : '';
+    model.workflows = [];
+    model.copies = [];
+    model.duplicate_paths = [];
+    model.shadowed = false;
+    model.hash_checked = previewState.checked.has(model.id);
+    const key = `${model.kind}:${model.relative_path.toLowerCase()}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(model);
+  }
+  for (const group of groups.values()) {
+    group.sort((a, b) => a.path.localeCompare(b.path));
+    if (group.length < 2) continue;
+    for (const model of group) {
+      model.shadowed = model.id !== group[0].id;
+      model.copies.push({
+        kind: model.kind,
+        name: model.relative_path,
+        role: model.shadowed ? 'shadowed' : 'active',
+        active_path: group[0].path,
+        other_paths: group.filter((other) => other.id !== model.id).map((other) => other.path),
+      });
+    }
+  }
+  const hashes = new Map();
+  for (const model of previewState.models.filter((model) => model.hash_checked)) {
+    if (!hashes.has(model.contentSignature)) hashes.set(model.contentSignature, []);
+    hashes.get(model.contentSignature).push(model);
+  }
+  for (const group of hashes.values()) {
+    if (group.length > 1)
+      for (const model of group)
+        model.duplicate_paths = group
+          .filter((other) => other.id !== model.id)
+          .map((other) => other.path);
+  }
+  const workflows = savedSamples.map((workflow) => {
+    const references = new Map();
+    for (const [kind, name] of workflow.references) {
+      const candidates = kind
+        ? groups.get(`${kind}:${name.toLowerCase()}`) || []
+        : previewState.models.filter(
+            (model) => model.relative_path.toLowerCase() === name.toLowerCase(),
+          );
+      for (const [index, model] of candidates.entries())
+        references.set(model.id, kind ? (index === 0 ? 'resolved' : 'fallback') : 'possible');
+    }
+    const models = [...references].map(([id, match]) => ({ id, match }));
+    for (const reference of models)
+      previewState.models
+        .find((model) => model.id === reference.id)
+        .workflows.push({ name: workflow.name, path: workflow.path, match: reference.match });
+    return { name: workflow.name, path: workflow.path, models };
+  });
+  return {
+    workflows,
+    copies: {
+      same_name_groups: [...groups.values()].filter((group) => group.length > 1).length,
+      verified_groups: [...hashes.values()].filter((group) => group.length > 1).length,
+      checked_files: previewState.models.filter((model) => model.hash_checked).length,
+    },
+  };
+}
+
+function previewTrash() {
+  const current = `${previewState.settings.trash_directory.replace(/[\\/]+$/, '')}\\trash`;
+  const locations = [...previewState.trashLocations].map((path) => {
+    const files = previewState.moves.filter(
+      (move) => move.status === 'trashed' && move.destination.startsWith(`${path}\\`),
+    );
+    return {
+      path,
+      current: path === current,
+      exists: true,
+      size_bytes: files.reduce((sum, file) => sum + file.size_bytes, 0),
+      file_count: files.length,
+    };
+  });
+  return {
+    size_bytes: locations.reduce((sum, location) => sum + location.size_bytes, 0),
+    file_count: locations.reduce((sum, location) => sum + location.file_count, 0),
+    locations,
+    warnings: [],
+    complete: true,
+  };
+}
+
+async function simulatedRequest(path, options = {}) {
+  await new Promise((resolve) => setTimeout(resolve, 160));
+  const body = options.body ? JSON.parse(options.body) : {};
+  const built = rebuildPreview();
+  let payload;
+  let status = 200;
+  if (path.endsWith('/inventory')) {
+    const roots = [
+      ...new Map(
+        samples.map((model) => [model.root, { kind: model.kind, path: model.root }]),
+      ).values(),
+    ];
+    payload = {
+      models: previewState.models,
+      roots,
+      warnings: [],
+      settings: previewState.settings,
+      workflow_scan: {
+        workflows: built.workflows,
+        directories: ['D:\\AI\\ComfyUI\\user\\default\\workflows'],
+      },
+      copies: built.copies,
+      trash: previewTrash(),
+    };
+  } else if (path.endsWith('/settings')) {
+    if (options.method === 'POST') {
+      if (!(body.stale_days > 0) || body.stale_days > 36500) {
+        status = 400;
+        payload = { error: 'Choose a recency window between 0 and 36500 days.' };
+      } else {
+        previewState.settings = { ...previewState.settings, ...body };
+        if (body.trash_directory)
+          previewState.trashLocations.add(`${body.trash_directory.replace(/[\\/]+$/, '')}\\trash`);
+        previewState.plans.clear();
+      }
+    }
+    payload ||= previewState.settings;
+  } else if (path.endsWith('/protection')) {
+    const model = previewState.models.find((model) => model.id === body.model_id);
+    model.protected = body.protected;
+    previewState.plans.clear();
+    payload = { model_id: model.id, protected: model.protected };
+  } else if (path.endsWith('/duplicates/scan')) {
+    const sizes = new Map();
+    for (const model of previewState.models) {
+      if (!sizes.has(model.size_bytes)) sizes.set(model.size_bytes, []);
+      sizes.get(model.size_bytes).push(model);
+    }
+    let hashed_files = 0;
+    let cached_files = 0;
+    for (const group of sizes.values())
+      if (group.length > 1)
+        for (const model of group) {
+          previewState.checked.has(model.id) ? cached_files++ : hashed_files++;
+          previewState.checked.add(model.id);
+        }
+    payload = { ...rebuildPreview().copies, hashed_files, cached_files, warnings: [] };
+  } else if (path.endsWith('/trash/summary')) payload = previewTrash();
+  else if (path.endsWith('/trash/preview')) {
+    const occupied = new Set(
+      previewState.moves
+        .filter((move) => move.status === 'trashed')
+        .map((move) => move.destination.toLowerCase()),
+    );
+    const selected = body.model_ids.map((id) =>
+      previewState.models.find((model) => model.id === id),
+    );
+    if (selected.some((model) => model.protected)) {
+      status = 400;
+      payload = { error: 'Protected models cannot be moved.' };
+    } else {
+      const files = selected.map((model) => {
+        const trash = `${previewState.settings.trash_directory.replace(/[\\/]+$/, '')}\\trash\\`;
+        let destination = trash + model.logical_path.replaceAll('/', '\\');
+        let counter = 0;
+        while (occupied.has(destination.toLowerCase()))
+          destination = `${trash}collisions\\${model.id}-${++counter}\\${model.logical_path.replaceAll('/', '\\')}`;
+        occupied.add(destination.toLowerCase());
+        return {
+          id: model.id,
+          source: model.path,
+          destination,
+          size_bytes: model.size_bytes,
+          workflows: model.workflows,
+          copies: model.copies,
+        };
+      });
+      const plan_id = `preview-plan-${Date.now()}`;
+      previewState.plans.set(plan_id, files);
+      payload = { plan_id, files };
+    }
+  } else if (path.endsWith('/trash')) {
+    const files = previewState.plans.get(body.plan_id) || [];
+    const results = files.map((file, index) => {
+      const id = `preview-move-${Date.now()}-${index}`;
+      const model = structuredClone(previewState.models.find((model) => model.id === file.id));
+      previewState.moves.unshift({
+        ...file,
+        id,
+        status: 'trashed',
+        created_at: new Date().toISOString(),
+        model,
+      });
+      previewState.models = previewState.models.filter((model) => model.id !== file.id);
+      return { ...file, id, success: true };
+    });
+    previewState.plans.delete(body.plan_id);
+    payload = { results };
+  } else if (path.endsWith('/moves')) payload = { moves: previewState.moves };
+  else if (path.endsWith('/restore')) {
+    const move = previewState.moves.find((move) => move.id === body.move_id);
+    previewState.models.push(structuredClone(move.model));
+    move.status = 'restored';
+    payload = { success: true };
+  } else {
+    status = 404;
+    payload = { error: 'Preview route unavailable' };
+  }
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+const api = { fetchApi: simulatedRequest };
+const app = {
+  extensionManager: {
+    registerSidebarTab(tab) {
+      tab.render(document.querySelector('#preview-launcher'));
+    },
+  },
+  registerExtension(extension) {
+    extension.setup();
+  },
+};
+
+// @ts-check
+
+const PREFIX = '/abg-model-analytics';
+const escape = (value) =>
+  String(value ?? '').replace(
+    /[&<>"']/g,
+    (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char],
+  );
+const date = (value) => (value ? new Date(value).toLocaleString() : 'No recorded history');
+const age = (value) => {
+  if (!value) return 'No recorded activity';
+  const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86400000));
+  return days === 0 ? 'Today' : days === 1 ? 'Yesterday' : `${days} days ago`;
+};
+
+function bytes(value) {
+  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+  let index = 0;
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index++;
+  }
+  return `${value.toFixed(index ? 1 : 0)} ${units[index]}`;
+}
+
+async function request(path, body) {
+  const response = await api.fetchApi(
+    PREFIX + path,
+    body === undefined
+      ? {}
+      : {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        },
+  );
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || `Request failed (${response.status})`);
+  return result;
+}
+
+class Dashboard {
+  constructor() {
+    this.selected = new Set();
+    this.tab = 'stale';
+    this.search = '';
+    this.kind = '';
+    this.root = '';
+    this.sort = 'size';
+    this.workflow = '';
+    this.busy = false;
+    this.hashing = false;
+  }
+
+  open() {
+    if (this.dialog?.isConnected) {
+      this.dialog.focus();
+      return;
+    }
+    if (!document.querySelector('link[data-abg-analytics]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = new URL('../css/style.css', import.meta.url).href;
+      link.dataset.abgAnalytics = 'true';
+      document.head.append(link);
+    }
+    this.selected.clear();
+    const dialog = document.createElement('dialog');
+    dialog.className = 'abg-analytics';
+    dialog.setAttribute('aria-labelledby', 'abg-title');
+    dialog.innerHTML = `
+      <header><div><span class="abg-eyebrow">YOUR COMFYUI LIBRARY</span><h2 id="abg-title">ABG Model Analytics</h2><p>Review model activity and make room with reversible cleanup.</p></div><div class="abg-header-actions"><button data-action="refresh">Rescan library</button><button data-action="close" aria-label="Close model analytics">Close</button></div></header>
+      <details class="abg-settings-panel"><summary><span>Cleanup settings</span><span class="abg-settings-summary">Choose a trash directory to get started</span></summary><form class="abg-settings">
+        <label class="abg-directory">Trash parent directory <input name="trash_directory" type="text" placeholder="D:\\ComfyCleanup" autocomplete="off" spellcheck="false" aria-describedby="abg-trash-help"></label>
+        <label>Recent within (days) <input name="stale_days" type="number" min="0.01" max="36500" step="any" required></label>
+        <button type="submit" class="abg-primary">Save settings</button>
+        <p id="abg-trash-help">Choose a directory on your ComfyUI computer. Files go into its trash/models/… subdirectory.</p>
+      </form></details>
+      <div class="abg-message" role="status" aria-live="polite"></div>
+      <div class="abg-overview" aria-label="Library overview"></div>
+      <nav aria-label="Model views" class="abg-tabs"></nav>
+      <p class="abg-history-note"></p>
+      <div class="abg-filters">
+        <label>Search <input type="search" name="search" placeholder="Model name or path"></label>
+        <label>Category <select name="kind" aria-label="Category"><option value="">All categories</option></select></label>
+        <label>Source directory <select name="root" aria-label="Source directory"><option value="">All directories</option></select></label>
+        <label>Saved workflow <select name="workflow" aria-label="Saved workflow"><option value="">All saved workflows</option></select></label>
+        <label>Sort <select name="sort" aria-label="Sort"><option value="size">Largest first</option><option value="oldest">Oldest use first</option><option value="newest">Newest use first</option><option value="name">Name</option></select></label>
+      </div>
+      <div class="abg-content" aria-busy="true">Loading inventory…</div>
+      <footer class="abg-selection"><div><strong class="abg-selection-count">No models selected</strong><small class="abg-selection-help">Select files to preview their trash destinations.</small></div><div class="abg-selection-actions"><button data-action="clear" disabled>Clear selection</button><button data-action="preview" class="abg-primary" type="button" disabled>Preview move (0)</button></div></footer>`;
+    document.body.append(dialog);
+    this.dialog = dialog;
+    dialog.querySelector('[data-action="close"]').onclick = () => dialog.close();
+    dialog.addEventListener('cancel', (event) => {
+      if (this.busy) event.preventDefault();
+    });
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      if (this.dialog === dialog) this.dialog = null;
+    });
+    dialog.querySelector('[data-action="refresh"]').onclick = () => this.refresh();
+    dialog.querySelector('[data-action="preview"]').onclick = () => this.preview();
+    dialog.querySelector('[data-action="clear"]').onclick = () => {
+      this.selected.clear();
+      this.render();
+    };
+    dialog.querySelector('form').onsubmit = async (event) => {
+      event.preventDefault();
+      if (this.busy) return;
+      const form = event.currentTarget;
+      this.setBusy(true);
+      try {
+        await request('/settings', {
+          trash_directory: form.elements.trash_directory.value,
+          stale_days: Number(form.elements.stale_days.value),
+        });
+        this.message('Settings saved.');
+        await this.refresh();
+        dialog.querySelector('.abg-settings-panel').open = false;
+      } catch (error) {
+        this.message(error.message, true);
+      } finally {
+        this.setBusy(false);
+      }
+    };
+    for (const field of ['search', 'kind', 'root', 'workflow', 'sort']) {
+      const input = dialog.querySelector(`[name="${field}"]`);
+      input.addEventListener(field === 'search' ? 'input' : 'change', () => {
+        this[field] = input.value;
+        this.render();
+      });
+      input.value = this[field];
+    }
+    dialog.showModal();
+    this.refresh();
+  }
+
+  message(text, error = false) {
+    const element = this.dialog?.querySelector('.abg-message');
+    if (element) {
+      element.textContent = text;
+      element.classList.toggle('abg-error', error);
+    }
+  }
+
+  setBusy(value) {
+    this.busy = value;
+    this.dialog
+      ?.querySelectorAll('.abg-settings input, .abg-settings button, [data-action=close]')
+      .forEach((element) => {
+        element.disabled = value;
+      });
+    this.updateSelection();
+  }
+
+  async refresh() {
+    if (!this.dialog) return;
+    const dialog = this.dialog;
+    const content = dialog.querySelector('.abg-content');
+    content.setAttribute('aria-busy', 'true');
+    try {
+      const data = await request('/inventory');
+      if (this.dialog !== dialog) return;
+      this.data = data;
+      this.selected = new Set(
+        [...this.selected].filter((id) =>
+          data.models.some((model) => model.id === id && model.can_move),
+        ),
+      );
+      const form = dialog.querySelector('form');
+      form.elements.trash_directory.value = data.settings.trash_directory;
+      form.elements.stale_days.value = data.settings.stale_days;
+      const settingsPanel = dialog.querySelector('.abg-settings-panel');
+      if (!settingsPanel.dataset.initialized) {
+        settingsPanel.open = !data.settings.trash_directory;
+        settingsPanel.dataset.initialized = 'true';
+      }
+      dialog.querySelector('.abg-settings-summary').textContent = data.settings.trash_directory
+        ? `${data.settings.trash_directory} · ${data.settings.stale_days}-day recency window`
+        : 'Choose a trash directory to enable moves';
+      dialog.querySelector('.abg-history-note').textContent =
+        `Tracking since ${date(data.settings.tracking_since)}. Unknown history includes activity from before tracking began. Recency reflects successful loads and successful workflow references.`;
+      for (const [field, values] of [
+        ['kind', [...new Set(data.models.flatMap((model) => model.kinds))]],
+        ['root', [...new Set(data.models.map((model) => model.root))]],
+        ['workflow', (data.workflow_scan?.workflows || []).map((workflow) => workflow.name)],
+      ]) {
+        const select = dialog.querySelector(`[name="${field}"]`);
+        select.innerHTML = `<option value="">All ${field === 'kind' ? 'categories' : field === 'workflow' ? 'saved workflows' : 'directories'}</option>${values
+          .sort()
+          .map((value) => `<option value="${escape(value)}">${escape(value)}</option>`)
+          .join('')}`;
+        if (!values.includes(this[field])) this[field] = '';
+        select.value = this[field];
+      }
+      await this.render();
+    } catch (error) {
+      this.message(error.message, true);
+    } finally {
+      content.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  filteredModels() {
+    if (!this.data) return [];
+    const search = this.search.toLowerCase();
+    return this.data.models
+      .filter(
+        (model) =>
+          this.matchesTab(model) &&
+          (!this.kind || model.kinds.includes(this.kind)) &&
+          (!this.root || model.root === this.root) &&
+          (!this.workflow ||
+            (model.workflows || []).some((workflow) => workflow.name === this.workflow)) &&
+          `${model.logical_path} ${model.path}`.toLowerCase().includes(search),
+      )
+      .sort((a, b) => {
+        if (this.sort === 'name') return a.logical_path.localeCompare(b.logical_path);
+        if (this.sort === 'oldest') return (a.last_used || '').localeCompare(b.last_used || '');
+        if (this.sort === 'newest') return (b.last_used || '').localeCompare(a.last_used || '');
+        return b.size_bytes - a.size_bytes;
+      });
+  }
+
+  matchesTab(model, tab = this.tab) {
+    if (tab === 'all') return true;
+    if (tab === 'protected') return model.protected;
+    if (tab === 'copies') return model.copies?.length || model.duplicate_paths?.length;
+    return model.status === tab;
+  }
+
+  workflowList(references = []) {
+    return references.length
+      ? `<ul class="abg-reference-list">${references.map((reference) => `<li><span>${escape(reference.name)}</span><small>${escape({ resolved: 'Resolves to this file', possible: 'Possible reference — custom loader', fallback: 'Fallback copy — another file currently resolves' }[reference.match] || reference.match)}</small></li>`).join('')}</ul>`
+      : '';
+  }
+
+  modelDetails(model) {
+    const workflows = model.workflows || [];
+    const copies = model.copies || [];
+    const identical = model.duplicate_paths || [];
+    const labels = [];
+    if (workflows.length)
+      labels.push(`${workflows.length} saved ${workflows.length === 1 ? 'workflow' : 'workflows'}`);
+    if (copies.length)
+      labels.push(
+        model.shadowed
+          ? 'Shadowed copy'
+          : copies.some((copy) => copy.role === 'active')
+            ? 'Active copy · same-name files'
+            : 'Same-name files',
+      );
+    if (identical.length) labels.push(`Identical content · ${identical.length + 1} files`);
+    if (!labels.length) return '';
+    return `<details class="abg-model-details"><summary>${escape(labels.join(' · '))}</summary><div>${this.workflowList(workflows)}${copies.map((copy) => `<p><strong>${escape(copy.kind)}: ${escape(copy.role)}</strong><small>ComfyUI currently resolves: ${escape(copy.active_path || 'Not resolved')}</small>${copy.other_paths.map((path) => `<small>Other location: ${escape(path)}</small>`).join('')}</p>`).join('')}${identical.length ? `<p><strong>Identical content verified with SHA-256</strong>${identical.map((path) => `<small>${escape(path)}</small>`).join('')}</p>` : copies.length ? '<p class="abg-detail-note">Matching names do not establish matching contents. Run an exact duplicate check to compare files.</p>' : ''}</div></details>`;
+  }
+
+  async setProtection(model) {
+    if (this.busy) return;
+    this.setBusy(true);
+    try {
+      await request('/protection', { model_id: model.id, protected: !model.protected });
+      await this.refresh();
+      this.message(
+        model.protected ? 'Protection removed.' : 'Model protected. It cannot be moved to trash.',
+      );
+    } catch (error) {
+      this.message(error.message, true);
+    } finally {
+      this.setBusy(false);
+    }
+  }
+
+  async checkDuplicates() {
+    if (this.hashing) return;
+    this.hashing = true;
+    this.message(
+      'Checking file contents for exact duplicates. Large model files can take a while; you can keep browsing.',
+    );
+    this.render();
+    try {
+      const result = await request('/duplicates/scan', {});
+      await this.refresh();
+      this.message(
+        `Exact duplicate check complete: ${result.verified_groups} identical-content groups. ${result.hashed_files} files checked, ${result.cached_files} cached.${result.warnings.length ? ` ${result.warnings.join('; ')}` : ''}`,
+        result.warnings.length > 0,
+      );
+    } catch (error) {
+      this.message(error.message, true);
+    } finally {
+      this.hashing = false;
+      this.render();
+    }
+  }
+
+  trashOverview() {
+    const trash = this.data.trash || {
+      size_bytes: 0,
+      file_count: 0,
+      locations: [],
+      warnings: [],
+      complete: true,
+    };
+    return `<div class="abg-trash-heading"><strong>${bytes(trash.size_bytes)} in trash</strong><span>${trash.file_count} files across ${trash.locations.length} locations</span></div><p class="abg-detail-note">Totals come from files on disk, including previous trash locations. Moving within one drive does not free its space. Trash is emptied manually.</p>${!trash.complete ? '<p class="abg-callout">Some locations are unavailable or contain skipped links. The total includes only files that could be scanned.</p>' : ''}${trash.locations.length ? `<details class="abg-trash-locations"><summary>Trash locations</summary><table><thead><tr><th>Directory</th><th>Size</th><th>Files</th></tr></thead><tbody>${trash.locations.map((location) => `<tr><td class="abg-path">${escape(location.path)}${location.current ? '<small>Current destination</small>' : '<small>Previous destination</small>'}${location.note ? `<small>${escape(location.note)}</small>` : ''}</td><td>${bytes(location.size_bytes)}</td><td>${location.file_count}</td></tr>`).join('')}</tbody></table></details>` : '<p>Configure a trash directory in Cleanup settings.</p>'}${trash.warnings.length ? `<details><summary>Trash scan notes</summary><ul>${trash.warnings.map((warning) => `<li>${escape(warning)}</li>`).join('')}</ul></details>` : ''}`;
+  }
+
+  async render() {
+    if (!this.dialog || !this.data) return;
+    const dialog = this.dialog;
+    this.updateSelection();
+    dialog.querySelector('.abg-selection').hidden = ['roots', 'moves', 'workflows'].includes(
+      this.tab,
+    );
+    const navigation = dialog.querySelector('.abg-tabs');
+    const overview = dialog.querySelector('.abg-overview');
+    overview.innerHTML = `${[
+      [
+        'stale',
+        'Not used recently',
+        `No recorded activity in ${this.data.settings.stale_days} days`,
+      ],
+      ['unknown', 'Unknown history', 'Review separately · no usage evidence yet'],
+      ['recent', 'Recently used', `Active within ${this.data.settings.stale_days} days`],
+    ]
+      .map(([status, label, detail]) => {
+        const models = this.data.models.filter((model) => model.status === status);
+        return `<button class="abg-stat abg-stat-${status}" data-status="${status}" aria-label="View ${label.toLowerCase()} models"><span>${escape(label)}</span><strong>${bytes(models.reduce((total, model) => total + model.size_bytes, 0))}</strong><small>${models.length} ${models.length === 1 ? 'model' : 'models'} · ${escape(detail)}</small></button>`;
+      })
+      .join(
+        '',
+      )}<button class="abg-stat abg-stat-trash" data-status="moves" aria-label="View trash and move history"><span>Trash</span><strong>${bytes(this.data.trash?.size_bytes || 0)}</strong><small>${this.data.trash?.file_count || 0} files · current and previous trash locations</small></button>`;
+    overview.querySelectorAll('[data-status]').forEach((button) => {
+      button.onclick = () => {
+        this.tab = button.dataset.status;
+        this.render();
+      };
+    });
+    const tabs = [
+      ['stale', 'Not recently used'],
+      ['unknown', 'Unknown history'],
+      ['recent', 'Recently used'],
+      ['all', 'All models'],
+      ['protected', 'Protected'],
+      ['copies', 'Copies'],
+      ['workflows', 'Saved workflows'],
+      ['roots', 'Directories'],
+      ['moves', 'Trash & history'],
+    ];
+    navigation.innerHTML = tabs
+      .map(
+        ([id, label]) =>
+          `<button type="button" data-tab="${id}" aria-pressed="${this.tab === id}">${label}${['roots', 'moves'].includes(id) ? '' : ` (${id === 'workflows' ? (this.data.workflow_scan?.workflows || []).length : this.data.models.filter((model) => this.matchesTab(model, id)).length})`}</button>`,
+      )
+      .join('');
+    navigation.querySelectorAll('button').forEach((button) => {
+      button.onclick = () => {
+        this.tab = button.dataset.tab;
+        this.render();
+      };
+    });
+    dialog.querySelector('.abg-filters').hidden = ['roots', 'moves', 'workflows'].includes(
+      this.tab,
+    );
+    const content = dialog.querySelector('.abg-content');
+    if (this.tab === 'workflows') {
+      const workflows = this.data.workflow_scan?.workflows || [];
+      content.innerHTML = `<p class="abg-detail-note">Saved references help you review cleanup impact. They do not count as recent activity. Known loaders identify the active file; custom loaders are marked as possible references.</p>${workflows.length ? `<div class="abg-scroll"><table><caption>Saved workflow references</caption><thead><tr><th>Workflow</th><th>Active file references</th><th>Possible / fallback references</th><th>Action</th></tr></thead><tbody>${workflows.map((workflow, index) => `<tr><td class="abg-path"><strong>${escape(workflow.name)}</strong><small>${escape(workflow.path)}</small></td><td>${workflow.models.filter((model) => model.match === 'resolved').length}</td><td>${workflow.models.filter((model) => model.match !== 'resolved').length}</td><td><button data-workflow-index="${index}" aria-label="View models referenced by ${escape(workflow.name)}">View models</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="abg-empty"><strong>No saved workflows found.</strong><p>Save a workflow in ComfyUI, then rescan the library.</p></div>'}`;
+      content.querySelectorAll('[data-workflow-index]').forEach((button) => {
+        button.onclick = () => {
+          this.workflow = workflows[Number(button.dataset.workflowIndex)].name;
+          this.kind = '';
+          this.root = '';
+          this.search = '';
+          this.tab = 'all';
+          for (const field of ['workflow', 'kind', 'root', 'search'])
+            dialog.querySelector(`[name="${field}"]`).value = this[field];
+          this.render();
+        };
+      });
+      return;
+    }
+    if (this.tab === 'moves') {
+      content.textContent = 'Loading move history…';
+      try {
+        const { moves } = await request('/moves');
+        if (this.dialog !== dialog || this.tab !== 'moves') return;
+        content.innerHTML = `${this.trashOverview()}<p class="abg-detail-note">Restore returns a file to its original path without overwriting existing files. Interrupted operations marked pending or restoring may need manual recovery.</p>${moves.length ? `<div class="abg-scroll"><table><caption>Moves and restores</caption><thead><tr><th>Date</th><th>Original path</th><th>Trash path</th><th>Status</th><th>Action</th></tr></thead><tbody>${moves.map((move) => `<tr><td>${escape(date(move.created_at))}</td><td class="abg-path">${escape(move.source)}</td><td class="abg-path">${escape(move.destination)}</td><td>${escape(move.status)}${move.error ? `<p class="abg-error">${escape(move.error)}</p>` : ''}</td><td>${move.status === 'trashed' ? `<button data-restore="${escape(move.id)}" aria-label="Restore ${escape(move.source)}">Restore</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p>No files have been moved.</p>'}`;
+        content.querySelectorAll('[data-restore]').forEach((button) => {
+          button.onclick = () => this.confirmRestore(button.dataset.restore, moves);
+        });
+      } catch (error) {
+        this.message(error.message, true);
+      }
+      return;
+    }
+    if (this.tab === 'roots') {
+      content.innerHTML = `<p>These paths come from ComfyUI’s live folder registry, including extra_model_paths.yaml and Desktop’s configured paths. To add model locations, configure them in ComfyUI and restart.</p><div class="abg-scroll"><table><caption>Configured model directories</caption><thead><tr><th>Category</th><th>Directory</th></tr></thead><tbody>${this.data.roots.map((root) => `<tr><td>${escape(root.kind)}</td><td class="abg-path">${escape(root.path)}</td></tr>`).join('')}</tbody></table></div>`;
+      if (this.data.warnings.length)
+        content.innerHTML += `<details open><summary>Scan notes (${this.data.warnings.length})</summary><ul>${this.data.warnings.map((warning) => `<li>${escape(warning)}</li>`).join('')}</ul></details>`;
+      return;
+    }
+    const models = this.filteredModels();
+    this.visible = models;
+    content.innerHTML = `<p class="abg-results-summary">${models.length} files · ${bytes(models.reduce((total, model) => total + model.size_bytes, 0))}${this.tab === 'stale' ? ` · Last recorded use more than ${escape(this.data.settings.stale_days)} days ago` : ''}${this.data.warnings.length ? ` · ${this.data.warnings.length} scan notes in Directories` : ''}</p>${this.tab === 'copies' ? `<div class="abg-copy-actions"><p>Same-name files may have different contents. Shadowed files are hidden by a higher-priority location in ComfyUI. Exact checks compare same-size files with SHA-256 and cache the results.</p><button data-check-duplicates ${this.hashing ? 'disabled' : ''}>${this.hashing ? 'Checking contents…' : 'Check exact duplicates'}</button></div>` : ''}${this.tab === 'unknown' ? '<p class="abg-callout">No recorded history is not the same as never used. These files may have been used before tracking began or by a loader we cannot observe.</p>' : ''}${models.length ? `<div class="abg-scroll"><table><caption class="abg-sr-only">Model inventory</caption><thead><tr><th><input type="checkbox" data-select-all aria-label="Select all movable files in this view"></th><th>Model / original path</th><th>Category</th><th>Size</th><th>Last activity</th><th>Status</th><th>Protection</th></tr></thead><tbody>${models.map((model) => `<tr><td><input type="checkbox" data-id="${model.id}" ${this.selected.has(model.id) ? 'checked' : ''} ${model.can_move ? '' : 'disabled'} aria-label="Select ${escape(model.path)}"></td><td class="abg-path"><strong>${escape(model.logical_path)}</strong><small>${escape(model.path)}</small>${model.disabled ? '<small>Disabled file</small>' : ''}${model.move_reason ? `<small>${escape(model.move_reason)}</small>` : ''}${this.modelDetails(model)}</td><td><span class="abg-category">${escape(model.kinds.join(', '))}</span></td><td class="abg-nowrap">${bytes(model.size_bytes)}</td><td title="${escape(`Loaded: ${date(model.last_loaded)}; Workflow reference: ${date(model.last_referenced)}`)}">${escape(age(model.last_used))}<small>${model.last_used ? escape(date(model.last_used)) : 'Tracking will update after use'}</small></td><td><span class="abg-badge abg-badge-${model.status}">${escape({ stale: 'Not recent', recent: 'Recent', unknown: 'Unknown' }[model.status])}</span></td><td><button class="abg-protect" data-protect="${model.id}" aria-pressed="${Boolean(model.protected)}" aria-label="${model.protected ? 'Unprotect' : 'Protect'} ${escape(model.path)}">${model.protected ? 'Protected' : 'Protect'}</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="abg-empty"><strong>No models match this view.</strong><p>Try another view or adjust your search and filters.</p></div>'}`;
+    content.querySelectorAll('[data-protect]').forEach((button) => {
+      button.onclick = () =>
+        this.setProtection(this.data.models.find((model) => model.id === button.dataset.protect));
+    });
+    content.querySelectorAll('[data-id]').forEach((input) => {
+      input.onchange = () => {
+        input.checked
+          ? this.selected.add(input.dataset.id)
+          : this.selected.delete(input.dataset.id);
+        this.updateSelection();
+      };
+    });
+    const checkButton = content.querySelector('[data-check-duplicates]');
+    if (checkButton) checkButton.onclick = () => this.checkDuplicates();
+    const all = content.querySelector('[data-select-all]');
+    if (all)
+      all.onchange = () => {
+        models
+          .filter((model) => model.can_move)
+          .forEach((model) => {
+            all.checked ? this.selected.add(model.id) : this.selected.delete(model.id);
+          });
+        content.querySelectorAll('[data-id]:not(:disabled)').forEach((input) => {
+          input.checked = all.checked;
+        });
+        this.updateSelection();
+      };
+    this.updateSelection();
+  }
+
+  updateSelection() {
+    const button = this.dialog?.querySelector('[data-action="preview"]');
+    if (!button) return;
+    button.textContent = `Preview move (${this.selected.size})`;
+    button.disabled = this.busy || !this.selected.size || !this.data?.settings.trash_directory;
+    const selected = (this.data?.models || []).filter((model) => this.selected.has(model.id));
+    this.dialog.querySelector('.abg-selection-count').textContent = selected.length
+      ? `${selected.length} ${selected.length === 1 ? 'model' : 'models'} selected · ${bytes(selected.reduce((total, model) => total + model.size_bytes, 0))}`
+      : 'No models selected';
+    this.dialog.querySelector('.abg-selection-help').textContent = !this.data?.settings
+      .trash_directory
+      ? 'Set a trash directory in Cleanup settings to enable moves.'
+      : selected.length
+        ? 'Review the exact destinations before any files move.'
+        : 'Select files to preview their trash destinations.';
+    this.dialog.querySelector('[data-action="clear"]').disabled = this.busy || !this.selected.size;
+    const all = this.dialog.querySelector('[data-select-all]');
+    if (all) {
+      const movable = (this.visible || []).filter((model) => model.can_move);
+      const count = movable.filter((model) => this.selected.has(model.id)).length;
+      all.checked = movable.length > 0 && count === movable.length;
+      all.indeterminate = count > 0 && count < movable.length;
+    }
+  }
+
+  confirm(title, description, rows, actionLabel, onConfirm) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'abg-analytics abg-confirm';
+    dialog.setAttribute('aria-labelledby', 'abg-confirm-title');
+    const affected = new Set(
+      rows.flatMap((row) =>
+        (row.workflows || [])
+          .filter((reference) => reference.match !== 'fallback')
+          .map((reference) => reference.name),
+      ),
+    );
+    const workflowWarning = affected.size
+      ? `<div class="abg-workflow-warning"><strong>Review saved workflow dependencies</strong><p>${affected.size} saved ${affected.size === 1 ? 'workflow references' : 'workflows reference'} this selection. Moving these files may make workflows fail or load a different copy.</p></div>`
+      : '';
+    dialog.innerHTML = `<span class="abg-eyebrow">REVIEW FILE LOCATIONS</span><h2 id="abg-confirm-title">${escape(title)}</h2><p>${escape(description)}</p>${workflowWarning}<div class="abg-scroll"><table><caption class="abg-sr-only">File move destinations</caption><thead><tr><th>From</th><th>To</th><th>Size</th></tr></thead><tbody>${rows.map((row) => `<tr><td class="abg-path">${escape(row.source)}${this.workflowList(row.workflows)}${(row.copies || []).some((copy) => copy.role === 'active') ? '<p class="abg-detail-note">A same-name file remains in another location and may become the active copy.</p>' : ''}</td><td class="abg-path abg-destination">${escape(row.destination)}</td><td>${bytes(row.size_bytes)}</td></tr>`).join('')}</tbody></table></div><p class="abg-error" role="alert"></p><footer><button data-cancel>Cancel</button><button class="abg-primary" data-confirm>${escape(actionLabel)}</button></footer>`;
+    let submitting = false;
+    document.body.append(dialog);
+    dialog.querySelector('[data-cancel]').onclick = () => dialog.close();
+    dialog.addEventListener('cancel', (event) => {
+      if (submitting) event.preventDefault();
+    });
+    dialog.addEventListener('close', () => dialog.remove());
+    dialog.querySelector('[data-confirm]').onclick = async () => {
+      if (submitting) return;
+      submitting = true;
+      dialog.querySelectorAll('button').forEach((button) => {
+        button.disabled = true;
+      });
+      dialog.querySelector('[data-confirm]').textContent = 'Moving files…';
+      this.setBusy(true);
+      try {
+        await onConfirm();
+        dialog.close();
+      } catch (error) {
+        dialog.querySelector('[role=alert]').textContent = error.message;
+      } finally {
+        submitting = false;
+        this.setBusy(false);
+        dialog.querySelectorAll('button').forEach((button) => {
+          button.disabled = false;
+        });
+        dialog.querySelector('[data-confirm]').textContent = actionLabel;
+      }
+    };
+    dialog.showModal();
+    dialog.querySelector('[data-cancel]').focus();
+  }
+
+  async preview() {
+    if (this.busy) return;
+    this.setBusy(true);
+    try {
+      const plan = await request('/trash/preview', { model_ids: [...this.selected] });
+      if (!this.dialog) return;
+      this.confirm(
+        'Review moves to trash',
+        `${plan.files.length} ${plan.files.length === 1 ? 'file' : 'files'} · ${bytes(plan.files.reduce((total, row) => total + row.size_bytes, 0))}. Cross-drive moves copy files before removing originals and can take time. Restore is available in Trash & history.`,
+        plan.files,
+        'Move to trash',
+        async () => {
+          const { results } = await request('/trash', { plan_id: plan.plan_id });
+          const failed = results.filter((result) => !result.success);
+          this.selected.clear();
+          this.tab = 'moves';
+          await this.refresh();
+          this.message(
+            `${results.length - failed.length} ${results.length - failed.length === 1 ? 'file' : 'files'} moved.${failed.length ? ` ${failed.length} failed: ${failed.map((result) => `${result.source}: ${result.error}`).join('; ')}` : ''}`,
+            failed.length > 0,
+          );
+        },
+      );
+    } catch (error) {
+      this.message(error.message, true);
+    } finally {
+      this.setBusy(false);
+    }
+  }
+
+  confirmRestore(id, moves) {
+    if (this.busy) return;
+    const move = moves.find((row) => row.id === id);
+    this.confirm(
+      'Restore model',
+      'Return this file to its original location. An existing file at that location will be kept and the restore will stop.',
+      [{ source: move.destination, destination: move.source, size_bytes: move.size_bytes }],
+      'Restore file',
+      async () => {
+        await request('/restore', { move_id: id });
+        await this.refresh();
+        this.message('File restored to its original location.');
+      },
+    );
+  }
+}
+
+const dashboard = new Dashboard();
+app.registerExtension({
+  name: 'ABG.ModelAnalytics',
+  commands: [
+    {
+      id: 'ABG.ModelAnalytics.Open',
+      label: 'ABG Model Analytics',
+      function: () => dashboard.open(),
+    },
+  ],
+  menuCommands: [{ path: ['extensions'], commands: ['ABG.ModelAnalytics.Open'] }],
+  async setup() {
+    if (typeof app.extensionManager?.registerSidebarTab === 'function') {
+      app.extensionManager.registerSidebarTab({
+        id: 'abg-model-analytics',
+        icon: 'pi pi-chart-bar',
+        title: 'ABG Model Analytics',
+        tooltip: 'Model usage and cleanup',
+        type: 'custom',
+        render(element) {
+          element.textContent = '';
+          const button = document.createElement('button');
+          button.textContent = 'Open ABG Model Analytics';
+          button.style.margin = '16px';
+          button.addEventListener('click', () => dashboard.open());
+          element.append(button);
+        },
+      });
+    } else {
+      const button = document.createElement('button');
+      button.textContent = 'ABG Model Analytics';
+      button.className = 'comfy-menu-btn abg-launcher';
+      button.onclick = () => dashboard.open();
+      const menu =
+        app.menu?.settingsGroup?.element?.parentElement || document.querySelector('.comfy-menu');
+      if (menu) menu.append(button);
+      else {
+        button.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:9999';
+        document.body.append(button);
+      }
+    }
+  },
+});
+dashboard.open();
+const previewBadge = document.createElement('span'); previewBadge.className = 'abg-preview-badge'; previewBadge.textContent = 'PREVIEW · SAMPLE DATA';
+dashboard.dialog.querySelector('h2').append(previewBadge);
+</script></body></html>

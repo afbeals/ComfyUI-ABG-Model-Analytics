@@ -1,0 +1,15 @@
+ComfyUI ABG Model Analytics
+
+Based on the idea and architecture of ComfyUI-Model-Analytics by Bennowan:
+https://github.com/Bennowan/ComfyUI-Model-Analytics
+Reference revision: dec3926e6cb7c407ca3a5066f7309e3925e3cb22
+
+Credit to Bennowan for the original model inventory, workflow analytics, and
+successful-load tracking extension. This personal version implements its own
+inventory, per-file usage database, workflow-reference tracking, configurable
+trash moves, restore journal, and frontend.
+
+The upstream LICENSE requires prominent attribution and restricts derivatives
+to non-commercial use. Those conditions are retained here. The upstream
+pyproject.toml says MIT, but its actual License file adds a non-commercial
+restriction; this project does not represent that license as standard MIT.
