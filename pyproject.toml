@@ -1,0 +1,17 @@
+[project]
+name = "comfyui-abg-model-analytics"
+version = "0.2.0"
+description = "Personal ComfyUI model usage analytics and reversible model cleanup."
+requires-python = ">=3.10"
+license = { text = "LicenseRef-Bennowan-NonCommercial" }
+dependencies = ["aiohttp>=3.9,<4"]
+
+[project.urls]
+Repository = "https://github.com/afbeals/ComfyUI-ABG-Model-Analytics"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

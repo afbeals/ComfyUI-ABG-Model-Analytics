@@ -1,0 +1,2 @@
+# ComfyUI already supplies this dependency; no additional packages are needed.
+aiohttp>=3.9,<4
